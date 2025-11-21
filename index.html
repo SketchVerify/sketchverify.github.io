@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="DiagrammerGPT: Generating Open-Domain, Open-Platform Diagrams via LLM Planning">
+  <meta name="keywords" content="diagram,diagram generation,gpt,diagrammer,diagram gpt,diagrammer gpt,diagrammergpt">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DiagrammerGPT (COLM 2024)</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script> -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <!-- <link rel="icon" href="./static/images/favicon.svg"> -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">DiagrammerGPT: Generating Open-Domain,<br>Open-Platform Diagrams via LLM Planning</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://aszala.com/">Abhay Zala</a>
+            </span>, &nbsp;  
+            <span class="author-block">
+              <a href="https://hl-hanlin.github.io/">Han Lin</a>
+            </span>, &nbsp;  
+              <span class="author-block">
+                <a href="https://j-min.io">Jaemin Cho</a>
+              </span>, &nbsp;
+              <span class="author-block">
+                <a href="https://www.cs.unc.edu/~mbansal/">Mohit Bansal</a>
+              </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">UNC Chapel Hill</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block" style="font-weight: bold; font-size: 1.3em;">COLM 2024</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2310.12128"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/aszala/DiagrammerGPT"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/datasets/abhayzala/AI2D-Caption"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <img style="max-width: 16px;" src="https://ctrl-adapter.github.io/static/hf_fa.ico" alt="Hugging Face">
+                  </span>
+                  <span>AI2D-Caption Dataset</span>
+                  </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero teaser">
+  <!-- <div class="container is-max-desktop"> -->
+  <div class="container">
+    <div class="hero-body" style="display: flex; justify-content: center;">
+      <!-- <h2 class="title is-3" style="text-align: center;">Summary Video</h2> -->
+      <video id="teaser" autoplay controls muted loop width="80%">
+        <source src="./static/images/teaser_video.mp4" type="video/mp4">
+      </video>
+
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+          Text-to-image (T2I) generation has seen significant
+          growth over the past few years. Despite this, there has been
+          little work on generating diagrams with T2I models. A diagram is a symbolic/schematic representation that explains
+          information using structurally rich and spatially complex
+          visualizations (e.g., a dense combination of related objects,
+          text labels, directional arrows, connection lines, etc.). Existing state-of-the-art T2I models often fail at diagram generation because they lack fine-grained object layout control
+          when many objects are densely connected via complex relations such as arrows/lines and also often fail to render comprehensible text labels.
+          </p>
+
+          <p>
+            To address this gap, we present <b>DiagrammerGPT</b>, a novel two-stage text-to-diagram generation framework that leverages the layout guidance capabilities of LLMs (e.g., GPT-4) to generate more accurate open-domain, open-platform diagrams. In the first stage, we use
+            LLMs to generate and iteratively refine <i>'diagram plans'</i> (in
+            a planner-auditor feedback loop) which describe all the entities (objects and text labels), their relationships (arrows
+            or lines), and their bounding box layouts. In the second
+            stage, we use a diagram generator, DiagramGLIGEN, and
+            a text label rendering module to generate diagrams following the diagram plans. To benchmark the text-to-diagram
+            generation task, we introduce AI2D-Caption, a densely annotated diagram dataset built on top of the AI2D dataset.
+            We show quantitatively and qualitatively that our DiagrammerGPT framework produces more accurate diagrams, outperforming existing T2I models. We also provide comprehensive analysis
+            including open-domain diagram generation, vector graphic diagram generation in different platforms, human-in-the-loop diagram plan editing, and multimodal planner/auditor LLMs (e.g., GPT-4Vision).
+          </p>
+          <p>
+            We hope that our work can inspire further research on the diagram generation capabilities of T2I models and LLMs.
+          </p>
+
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+    <!-- Paper video. -->
+    <!-- <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Video</h2>
+        <div class="publication-video">
+          <iframe src="https://www.youtube.com/embed/MrKrnHhk8IA?rel=0&amp;showinfo=0"
+                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div> -->
+    <!--/ Paper video. -->
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Summary</h2>
+
+        <img src="./static/images/figure_1.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Figure 1. An overview of DiagrammerGPT, our two-stage framework for open-domain, open-platform diagram generation.</b>
+          In the first diagram planning stage (Sec. 3.1), given a prompt, our LLM (GPT-4) generates a diagram plan,which consists of dense entities (objects and text labels),
+          fine-grained relationships (between the entities), and precise layouts (2D bounding boxes of entities). Then, the LLM iteratively refines
+          the diagram plan (i.e., updating the plan to better align with the input prompts). In the second diagram generation stage (Sec. 3.2), our
+          DiagramGLIGEN outputs the diagram given the diagram plan, then, we render the text labels on the diagram.
+        </div>
+
+        <br><br>
+
+        <h3 class="title is-4">Stage 1: Diagram Planning</h3>
+        <img src="./static/images/figure_2.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Figure 2. Illustration of the first stage of DiagrammerGPT: diagram planning (Sec. 3.1).</b> We use a planner LLM (e.g., GPT-4) to create
+          the fine-grained layouts of diagrams, which we call diagram plans. We first generate an initial diagram from the input text prompt with an
+          LLM (left). Then we iteratively refine diagram plans in a feedback loop of the planner and auditor LLMs, where the planner and auditor
+          LLMs are based on the same LLM architecture with different preambles (right).
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            We first generate diagram plans with a planner LLM (GPT-4) via in-context learning.
+            A <i>diagram plan</i> consists of three components: (1) entities - a dense list of objects (e.g., larva in
+            Fig. 2) and text labels (e.g., “egg” in Fig. 2); (2) relationships - complex relationships between entities (e.g., objectobject relationship “[obj 0] has an arrow to [obj 1]” or
+            object-text label relationship “[text label 0] labels [obj 0]”);
+            (3) layouts - 2D bounding boxes of the entities (e.g.,
+            “[obj 0]: [20, 30, 14, 14]” in Fig. 2). For object-object relationships, we utilize two types: line and arrow (a line
+            with explicit start and end entities), which are useful when
+            specifying object relationships in diagrams such as flow
+            charts or life cycles. For object-text label relationships, we
+            specify which object each label refers to. For layouts, we
+            use the [x, y, w, h] format for 2D bounding boxes, whose
+            coordinates are normalized and integer-quantized within
+            {0, 1, · · · 100}.
+          </p>
+          <p>
+            Then, we introduce an auditor LLM that checks for any mismatch between the current
+            diagram plan and the input prompt. It then provides feedback, enabling the planner LLM to refine the diagram plans.
+            Our auditor and planner LLMs form a feedback loop to iteratively refine the diagram plans.
+          </p>
+        </div>
+
+
+        <br><br>
+        <h3 class="title is-4">Stage 2: Diagram Generation</h3>
+        <img src="./static/images/figure_3.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Figure 3. Illustration of the second stage of DiagrammerGPT: diagram generation (Sec. 3.2).</b> We first generate the objects following the
+          layouts in diagram plan with DiagramGLIGEN, our layout-guided diagram generation model. Then we use the Pillow Python package to
+          render comprehensible text labels.
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            While existing text-to-image generation models demonstrate photorealistic image generation capabilities,
+            in the text-to-diagram generation task, conveying factual information from the text description is more crucial than producing
+            realistic objects. In our experiments, we observe that Stable Diffusion v1.4,
+            a recent strong text-to-image generation model, often omits important objects,
+            generates incorrect relationships between objects, and generates unreadable
+            text labels (see Sec. 5 and Fig. 5).
+            To tackle these issues, <b>we introduce DiagramGLIGEN</b>,
+            a layout-guided diagram generation model capable of leveraging the knowledge of text-to-image generation models
+            while adhering closely to the diagram plans.
+            We train DiagramGLIGEN on <b>our new AI2D-Caption dataset</b>
+            (see Sec. 4.1 for details), which contains annotations of
+            overall diagram captions and bounding-box descriptions
+            for 4.8K scientific diagrams extended from the AI2D
+            dataset.
+          </p>
+          <p>
+            In our diagram generation
+            pipeline, instead of relying on diffusion models for pixel-level generation of text labels, we explicitly render clear
+            text labels on the diagrams following diagram plan with the
+            Pillow Python package.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Quantitative Results</h2>
+
+        <br><br>
+
+        <h3 class="title is-4">Main Results</h3>
+        <img src="./static/images/table_1.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Table 1. Comparison of DiagrammerGPT to existing text-to-image generation baseline models.</b>
+          On all metrics, DiagrammerGPT outperforms the baselines, indicating that our method is more effective for generating accurate diagrams.
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            Table 1 left block shows the VPEval results.
+          For both Stable Diffusion v1.4 and VPGen baselines, fine-tuning improves the score for object skill (e.g., 70.1 → 75.4
+          for Stable Diffusion v1.4, and 64.1 → 69.1 for VPGen),
+          but does not help much or sometimes decreasing scores for
+          count (48.1 → 44.3 for Stable Diffusion v1.4, and 39.2 →
+          41.8 for VPGen). For relationships, it hurts Stable Diffusion v1.4 slightly (76.7 → 73.7) and helps VPGen (69.8 →
+          74.6 for). For text, both models achieve 0 scores before
+          and after fine-tuning. Our DiagrammerGPT outperforms
+          both zeroshot and fine-tuned baselines on both overall and
+          skill-specific VPEval scores, showcasing the strong layout
+          control, object relationship representation, and accurate text
+          rendering capability of our diagram generation framework.
+          </p>
+          <p>
+            Table 1 middle block
+            shows captioning scores (with LLaVA 1.5). Our DiagrammerGPT outperforms both the zeroshot and fine-tuned baselines indicating our generated diagrams have more relevant information to the input prompt than the baselines
+            (which is a critical aspect of diagrams). Our DiagrammerGPT significantly outperforms both fine-tuned VPGen
+            (31.7 vs. 4.2) and fine-tuned Stable Diffusion v1.4 (31.7 vs.
+            18.2) for CIDEr and also achieves a few higher points on
+            BERTScore.
+          </p>
+          <p>
+            Table 1 right block shows CLIPScore (with CLIP-ViT
+            L/14). Our DiagrammerGPT outperforms the zeroshot
+            and fine-tuned baselines indicating our generated diagrams
+            more closely reflect the input prompt (image-text similarity) and resemble the ground-truth diagrams (image-image
+            alignment). For CLIPScore<sup>Img-Txt</sup>, DiagrammerGPT has
+            slight improvement over fine-tuned Stable Diffusion v1.4
+            (32.9 vs. 30.1). For CLIPScore<sup>Img-Img</sup>, DiagrammerGPT has
+            a larger improvement over fine-tuned Stable Diffusion v1.4
+            (74.5 vs. 68.1).
+          </p>
+        </div>
+
+
+        <br><br>
+        <h3 class="title is-4">Human Evaluation</h3>
+        <img src="./static/images/table_2.png" alt="Teaser" width="50%">
+        <div class="content has-text-justified">
+          <b>Table 2. Human evaluation of pairwise preferences</b> between our
+          DiagrammerGPT and Stable Diffusion v1.4 regarding both image-text alignment and object relationships.
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            As discussed in Sec. 4.4, we conduct a human preference study, comparing our DiagrammerGPT and
+            its closest/the strongest baseline, fine-tuned Stable Diffusion v1.4 in image-text alignment and object relationships.
+            As shown in Table 2, our DiagrammerGPT achieves a
+            higher preference than Stable Diffusion v1.4 in both image-text alignment (36% vs 20%) and object relationships (48%
+            vs 30%) criteria
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Qualitative Examples & Analysis</h2>
+        <br><br>
+        <h3 class="title is-4">Comparison with Baselines</h3>
+        <img src="./static/images/figure_5.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Figure 5. Example diagram generation results</b> from baselines (fine-tuned Stable Diffusion v1.4 and AutomaTikZ) and our DiagrammerGPT
+          (both diagram plan and final diagram) on the AI2D-Caption test split. In the first example, our DiagrammerGPT correctly gets the object
+          count right and has clear text, whereas Stable Diffusion v1.4 overpopulates the entities orbiting around the sun. In the second example, our
+          DiagrammerGPT generates a quite accurate diagram plan (with all required elements) and a diagram that mostly reflects the plan, whereas
+          Stable Diffusion v1.4 fails to show a life cycle (i.e., missing the egg, pupa, and larva). As noted in Sec. 5.2, once a better backbone becomes
+          available, our DiagrammerGPT can produce better diagrams based on the diagram plans. AutomaTikZ struggles to generate the proper
+          layouts and objects for both examples.
+        </div>
+        <div class="content has-text-justified">
+          Fig. 5 shows example diagrams generated by the baselines (Stable Diffusion v1.4
+          and AutomaTikZ) and our DiagrammerGPT (both diagram
+          plan and final generation diagram) on the AI2D-Caption test
+          split. Our diagram plans strongly reflect the prompts and
+          the final diagrams are more aligned to the input prompts. In
+          Fig. 5 top example, our diagram correctly shows the earth in
+          four phases revolving around the sun and in the second example, our diagram plan correctly represents the life cycle
+          of a butterfly and the generated diagram captures the circular flow of the diagram plan as well most aspects of the life
+          cycle. Stable Diffusion v1.4 either over- or under-generates
+          objects in the image (e.g., too many earths in the first example and missing egg/larva/pupa stages in Fig. 5 bottom
+          example), and AutomaTikZ fails to generate proper layouts
+          and objects. Although our generated diagram plans are generally correct, however, sometimes DiagramGLIGEN can
+          fail to properly follow all aspects (e.g., the egg is misdrawn
+          and the larva/pupa are swapped in Fig. 5 bottom example).
+          As noted in Sec. 5.2, once a better backbone becomes available, our DiagramGLIGEN can produce better diagrams
+          following the diagram plans.
+        </div>
+
+        <br><br>
+
+        <h3 class="title is-4">Diagram Plan Refinement</h3>
+        <img src="./static/images/figure_6.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Figure 6. Examples from our diagram refinement step.</b> Our auditor LLM can help reorganize the connections between the components to
+          be more clear in the first example and prevent overlaps of objects in the second example
+        </div>
+        <div class="content has-text-justified">
+          In Fig. 6, we show how our
+          diagram refinement step (see Sec. 3.1) improves the diagram plans. In the top example, the switch is not connected
+          to the battery, thus does not affect the circuit. After refinement, the connections are corrected so the switch is now
+          also connected to the circuit and the layouts are adjusted
+          to have a more straightforward flow. In the bottom example, the moon phase of 'New Moon' is too low and overlaps
+          with the 'Earth' object. After refinement, there is no more
+          overlap.
+        </div>
+
+        <br><br>
+
+        <h3 class="title is-4">Open-Domain Diagram Generation</h3>
+        <img src="./static/images/figure_7.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Figure 7. Examples of open-domain generation</b> demonstrate that our DiagrammerGPT can create diagrams that adhere to the input text
+          prompts. Although DALL-E 3 yields images with superior visual quality, it tends to generate diagrams with redundant and crowded objects
+          and also struggles to follow the prompt accurately (e.g., in the second example, it is not clear where the locations of layers such as the
+          'inner core', 'outer core', and 'mantle' are. In the third example, it generates too many objects that are not in rows).
+        </div>
+        <div class="content has-text-justified">
+          In Fig. 7, we demonstrate that our planner LLM can extend its capabilities to domains beyond the three specific
+          areas (astronomy, biology, and engineering) for which we
+          have in-context examples. As shown in the figure, our planner LLM generates fairly accurate layouts. While our DiagramGLIGEN struggles in some cases, it is able to strongly
+          adhere to the diagram plan. As mentioned in Sec. 5.2,
+          once a stronger layout-guided image generation model than
+          GLIGEN with Stable Diffusion v1.4 backbone is available,
+          our DiagrammerGPT can produce higher quality results.
+          In Fig. 7, we also compare the recently released DALL-E
+          3 model. We find that DALL-E 3 generally produces
+          images with good aesthetic style but tends to generate diagrams with redundant and crowded objects (e.g., excessive
+          unnecessary text descriptions in the rock and Earth examples, and an overabundance of plants in the third example).
+          It also continues to struggle with creating accurate diagrams
+          that adhere to a prompt (e.g., generating incorrect layers in
+          the earth example and generating three columns of plants
+          instead of three rows in the plant example). The DALL-E 3
+          system card also notes that DALL-E 3 tends to generate
+          scientifically inaccurate information in diagrams
+        </div>
+
+
+        <br><br>
+
+        <h3 class="title is-4">Vector Graphic Diagram Generation in Different Platforms</h3>
+        <img src="./static/images/figure_8.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Figure 8. Examples of vector graphic diagrams generated with our diagram plans</b>
+          and exported into Microsoft PowerPoint and Inkscape (with icons from Noun Project Icons API).
+        </div>
+        <div class="content has-text-justified">
+          Although our primary focus is on a pixel-level diagram generation pipeline with DiagramGLIGEN, our diagram plans can also facilitate the creation of vector graphic
+          diagrams. These diagrams afford users significant flexibility for further edits and personalization of their diagram
+          layouts, such as changing colors, fonts, and object positions, or altering the diagram size without degrading quality. To achieve this, we render
+          our diagram plans in PowerPoint via VBA language
+          and in
+          Inkscape via a Python scripting extension (see Fig. 8).
+          While we experiment with these two platforms, <b>our diagram plans can
+          be flexibly exported to any platform that supports script integration</b>. In both platforms, we integrate features for text
+          and arrows/lines to delineate object text labels and relationships respectively. We represent objects using icons, which
+          are retrieved via the Noun Project Icons API based on corresponding text descriptions.
+        </div>
+
+
+        <br><br>
+
+        
+        <h3 class="title is-4">Human-in-the-Loop Diagram Plan Editing</h3>
+        <img src="./static/images/figure_9.png" alt="Teaser" width="80%">
+        <div class="content has-text-justified">
+          <b>Figure 9. An illustration of human-in-the-loop diagram plan editing.</b> Our DiagrammerGPT first provides an initial diagram plan with the
+          corresponding generated diagram, users can then review the generated layouts/diagrams and make adjustments based on their needs. With
+          the user-refined diagram plan, our DiagramGLIGEN creates diagrams that better suit the users' requirements
+        </div>
+        <div class="content has-text-justified">
+          With the diagram plans being rendered in vector graphic platforms, as
+          mentioned above, our DiagrammerGPT can provide an editable diagram plan, allowing for human-in-the-loop editing. As illustrated in Fig. 9,
+          our framework first generates an initial diagram plan along with the rendered image.
+          Users can then review the generated layouts/diagrams and
+          make adjustments based on their needs/wants (e.g., move the objects, add/remove objects, adjust object sizes, etc.).
+          With the human-refined diagram plan, users can either keep
+          it in vector format and use icons (as mentioned in the previous paragraph) or give it back to DiagramGLIGEN and
+          then create pixel-level diagrams, resulting in diagrams/layouts that are better suited to end-users requirements.
+        </div>
+
+
+        <br><br>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop content">
+    <h3 class="title">Limitations</h3>
+    <p style="font-size: 0.8em;">
+      Our DiagrammerGPT framework is for research purposes and is not intended for commercial use (and therefore should be used with caution in real-world applications, with human supervision,
+      e.g., as described in Sec. 5.4 human-in-the-loop diagram plan editing).
+    </p>
+  </div>
+</section>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>
+      @inproceedings{Zala2023DiagrammerGPT,
+        author = {Abhay Zala and Han Lin and Jaemin Cho and Mohit Bansal},
+        title = {DiagrammerGPT: Generating Open-Domain, Open-Platform Diagrams via LLM Planning},
+        year = {2024},
+        booktitle = {COLM},
+}
+    </code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <!-- <div class="content has-text-centered">
+      <a class="icon-link"
+         href="./static/videos/nerfies_paper.pdf">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div> -->
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          The webpage was adapted from <a href="https://github.com/nerfies/nerfies.github.io">nerfies</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
