@@ -18,13 +18,30 @@
     gtag('js', new Date());
     gtag('config', 'G-PYVRSFMDRL');
   </script>
+  
   <style>
     .qual-video {
       width: 360px;      /* or any size you want */
       height: 225px;     /* equal height fixes the cosmos issue */
       object-fit: cover; /* crops slightly to keep uniform size */
       border-radius: 4px;
-    }
+    }.title-line {
+  display: flex;
+  align-items: center;      /* ensures icon aligns to first line */
+  justify-content: center;  /* keeps centered on page */
+  gap: 0.5rem;
+}
+
+.icon-title img {
+  height: 2.0em;            /* scale icon with text size */
+  margin-bottom: 0em;     /* fine-tune vertical alignment */
+}
+
+.title-subline {
+  text-align: center;
+  margin-top: 0.2rem;
+}          /* space between icon and text */
+}
   </style>
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
@@ -51,11 +68,23 @@
   <div class="hero-body">
     <div class="container is-max-desktop">
       <div class="columns is-centered">
-        <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">
-            SketchVerify: Planning with Sketch-Guided Verification<br>
-            for Physics-Aware Video Generation
-          </h1>
+        <div class="column has-text-centered"><h1 class="title is-1 publication-title">
+
+  <div class="title-line">
+    <span class="icon-title">
+      <img src="./static/images/icon.png" alt="SketchVerify icon">
+    </span>
+    <span>SketchVerify: Planning with Sketch-Guided Verification</span>
+  </div>
+
+  <div class="title-subline">
+    for Physics-Aware Video Generation
+  </div>
+
+</h1>
+
+        </h1>
+
           <div class="is-size-5 publication-authors">
             <span class="author-block">
               <a href="https://h6kplus.github.io/owenhuang.github.io/">Yidong Huang<sup>1</sup></a>
